@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class controllers {
@@ -28,19 +29,35 @@ public class controllers {
     }
 
     @PutMapping("editar/{id}")
-    public String update(@PathVariable Long id,@RequestBody Persona persona){
-    Persona updatePersona = repositorio.findById(id).get();
-    updatePersona.setNombre(persona.getNombre());
-    updatePersona.setTelefono(persona.getTelefono());
-    repositorio.save(updatePersona);
-    return "EDITADO CORRECTAMENTE";
+    public String update(@PathVariable Long id, @RequestBody Persona persona) {
+        // Obtener la persona existente de la base de datos
+        Optional<Persona> personaOptional = repositorio.findById(id);
+
+        if (personaOptional.isPresent()) {
+            // Copiar los campos relevantes de la persona recibida a la persona existente
+            Persona updatePersona = personaOptional.get();
+            updatePersona.setNombre(persona.getNombre());
+            updatePersona.setTelefono(persona.getTelefono());
+
+            // Guardar la persona actualizada en la base de datos
+            repositorio.save(updatePersona);
+
+            return "EDITADO CORRECTAMENTE";
+        } else {
+            return "No se encontró la persona con el ID proporcionado";
+        }
     }
 
-    @DeleteMapping("delete/¨{id}")
+
+    @DeleteMapping("delete/{id}")
     public String delete(@PathVariable Long id){
-        Persona deletePersona = repositorio.findById(id).get();
-        repositorio.delete(deletePersona);
-        return "ELIMINADO";
+        Persona deletePersona = repositorio.findById(id).orElse(null);
+        if(deletePersona != null){
+            repositorio.delete(deletePersona);
+            return "ELIMINADO";
+        } else {
+            return "No se encontró la persona con el ID proporcionado";
+        }
     }
 
 }

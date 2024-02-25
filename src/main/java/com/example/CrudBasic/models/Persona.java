@@ -20,5 +20,15 @@ public class Persona {
     @Setter
     private String telefono;
 
+    public void setTelefono(String telefono) {
+        // Validar que el número de teléfono solo contenga dígitos
+        if (telefono.matches("\\d+")) {
+            this.telefono = telefono;
+        } else {
+            // Enviar un mensaje de error si el número de teléfono contiene caracteres no numéricos
+            throw new IllegalArgumentException("El número de teléfono solo debe contener dígitos");
+        }
+    }
+
 }
 
